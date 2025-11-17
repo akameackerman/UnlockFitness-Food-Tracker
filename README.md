@@ -1,2 +1,2 @@
-# UnlockFitness-Food-Tracker
-Food Tracker for Unlock Fitness
+## 🚀 Live Project
+👉 [View Unlock Fitness – Food Tracker here!](https://akameackerman.github.io/UnlockFitness-Food-Tracker/)  
