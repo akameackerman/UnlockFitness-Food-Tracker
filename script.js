@@ -1,15 +1,8 @@
-// Unlock Fitness – Food Tracker JavaScript
-
 const DAILY_GOAL = 2000;
-
-// meals will be an object like:
-// { breakfast: { name: 'Oatmeal', calories: 250 }, lunch: {...}, dinner: {...} }
 let meals = {};
 
 // which meal user clicked (+)
 let currentMealType = null;
-
-// Map label text to a key we use in JS/localStorage
 function getMealTypeFromLabel(labelText) {
   const lower = labelText.toLowerCase();
   if (lower.includes("breakfast")) return "breakfast";
@@ -18,7 +11,7 @@ function getMealTypeFromLabel(labelText) {
   return "meal";
 }
 
-// Find the .meal div for a given type
+// .meal div for a given type
 function findMealRow(type) {
   const rows = document.querySelectorAll(".meal");
   for (const row of rows) {
@@ -32,12 +25,10 @@ function findMealRow(type) {
   return null;
 }
 
-// Update Total Calories text and meal descriptions
+// Total Calories text and meal descriptions
 function renderMeals() {
-  // Make sure meals is at least an empty object
+ 
   meals = meals || {};
-
-  // Render each meal row text
   ["breakfast", "lunch", "dinner"].forEach((type) => {
     const row = findMealRow(type);
     if (!row) return;
@@ -87,7 +78,7 @@ function loadMeals() {
   }
 }
 
-// Handle clicking the "+" buttons (Breakfast / Lunch / Dinner)
+// "+" buttons (Breakfast / Lunch / Dinner)
 function setupAddButtons() {
   const addButtons = document.querySelectorAll(".add");
   const title = document.getElementById("eatTitle");
@@ -107,7 +98,6 @@ function setupAddButtons() {
       } else if (title) {
         title.textContent = "Did you eat today?";
       }
-      // overlay opens automatically because of href="#eat"
     });
   });
 }
@@ -117,15 +107,15 @@ function setupPopupButtons() {
   const yesButton = document.querySelector(".pill.pill-ghost");
   const addMealButton = document.querySelector(".pill.pill-primary");
 
-  // "Yes, I did" just closes the popup
+  // "Yes, I did" 
   if (yesButton) {
     yesButton.addEventListener("click", (e) => {
       e.preventDefault();
-      window.location.hash = ""; // close overlay
+      window.location.hash = ""; 
     });
   }
 
-  // "Add a meal" – prompt for name + calories
+  // "Add a meal" 
   if (addMealButton) {
     addMealButton.addEventListener("click", (e) => {
       e.preventDefault();
@@ -156,7 +146,7 @@ function setupPopupButtons() {
       saveMeals();
       renderMeals();
 
-      window.location.hash = ""; // close overlay
+      window.location.hash = "";
     });
   }
 }
@@ -195,7 +185,7 @@ function resetMeals() {
   renderMeals();
 }
 
-// -------- Initialize on DOM ready --------
+// Initialize on DOM ready
 document.addEventListener("DOMContentLoaded", () => {
   console.log("🍽 Food tracker JS loaded");
 
