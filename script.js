@@ -173,6 +173,13 @@ function setupDeleteOnDetails() {
     renderMeals();
   });
 }
+function resetMeals() {
+  if (!confirm("Clear all today's meals and reset calories to 0?")) return;
+
+  meals = {};                 // empty the in-memory object
+  localStorage.removeItem("uf_meals");  // or saveMeals() after clearing
+  renderMeals();              // re-draw UI (total becomes 0, messages reset)
+}
 
 // Initialize when DOM is ready
 document.addEventListener("DOMContentLoaded", () => {
@@ -182,3 +189,4 @@ document.addEventListener("DOMContentLoaded", () => {
   setupPopupButtons();
   setupDeleteOnDetails();
 });
+
