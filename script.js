@@ -181,6 +181,8 @@ function setupDeleteOnDetails() {
 }
 
 function resetMeals() {
+  console.log("✅ resetMeals() called");
+
   const ok = confirm("Clear all today's meals and reset calories to 0?");
   if (!ok) return;
 
@@ -189,17 +191,23 @@ function resetMeals() {
   renderMeals();
 }
 
-// Initialize on DOM ready
+// -------- Initialize on DOM ready --------
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("🍽 Food tracker JS loaded");
+
   loadMeals();
   renderMeals();
   setupAddButtons();
   setupPopupButtons();
   setupDeleteOnDetails();
 
-  // Hook up the Reset Day button
   const resetBtn = document.getElementById("resetDay");
+  console.log("resetBtn is:", resetBtn);
+
   if (resetBtn) {
-    resetBtn.addEventListener("click", resetMeals);
+    resetBtn.addEventListener("click", () => {
+      console.log("🟠 Reset button clicked");
+      resetMeals();
+    });
   }
 });
