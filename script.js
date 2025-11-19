@@ -1,21 +1,23 @@
 const DAILY_GOAL = 2000;
+
+// All meals are stored here
 let meals = {};
 let currentMealType = null;
 
 function getMealTypeFromLabel(labelText) {
-  const lower = labelText.toLowerCase();
+  const lower = (labelText || "").toLowerCase();
   if (lower.includes("breakfast")) return "breakfast";
   if (lower.includes("lunch")) return "lunch";
   if (lower.includes("dinner")) return "dinner";
   return "meal";
 }
 
-// Find the .meal div for a given type
 function findMealRow(type) {
   const rows = document.querySelectorAll(".meal");
   for (const row of rows) {
     const label = row.querySelector(".label");
     if (!label) continue;
+
     const text = label.textContent.toLowerCase();
     if (type === "breakfast" && text.includes("breakfast")) return row;
     if (type === "lunch" && text.includes("lunch")) return row;
@@ -24,7 +26,7 @@ function findMealRow(type) {
   return null;
 }
 
-// Update Total Calories text and meal descriptions
+// Render meals + total calories on the page 
 function renderMeals() {
   meals = meals || {};
 
@@ -49,35 +51,40 @@ function renderMeals() {
     }
   });
 
-  // Calculate total calories
+  //  Total calories
   const total = Object.values(meals).reduce((sum, m) => {
     if (!m) return sum;
     return sum + (m.calories || 0);
   }, 0);
 
+  // Total Calories text
   const totalStrong = document.querySelector(".today-pill strong");
   if (totalStrong) {
     totalStrong.textContent = `${total} Kcal / ${DAILY_GOAL} kcal`;
   }
 }
 
-// Save to localStorage
+//  Save meals to localStorage 
 function saveMeals() {
   localStorage.setItem("uf_meals", JSON.stringify(meals));
 }
 
-// Load from localStorage
+// Load meals from localStorage
 function loadMeals() {
   const saved = localStorage.getItem("uf_meals");
-  if (!saved) return;
+  if (!saved) {
+    meals = {};
+    return;
+  }
   try {
     meals = JSON.parse(saved) || {};
   } catch (e) {
+    console.error("Error parsing saved meals:", e);
     meals = {};
   }
 }
 
-// Handle clicking the "+" buttons (Breakfast / Lunch / Dinner)
+// "+" buttons (Breakfast / Lunch / Dinner) 
 function setupAddButtons() {
   const addButtons = document.querySelectorAll(".add");
   const title = document.getElementById("eatTitle");
@@ -96,21 +103,20 @@ function setupAddButtons() {
       } else if (title) {
         title.textContent = "Did you eat today?";
       }
-     
     });
   });
 }
 
-// Buttons inside the popup
+// Popup buttons inside the modal
 function setupPopupButtons() {
   const yesButton = document.querySelector(".pill.pill-ghost");
   const addMealButton = document.querySelector(".pill.pill-primary");
 
-  // "Yes, I did" 
+  // "Yes, I did"
   if (yesButton) {
     yesButton.addEventListener("click", (e) => {
       e.preventDefault();
-      window.location.hash = ""; // close overlay
+      window.location.hash = "";
     });
   }
 
@@ -121,7 +127,8 @@ function setupPopupButtons() {
 
       if (!currentMealType) currentMealType = "meal";
 
-      const prettyName = (currentMealType === "meal" ? "this meal" : currentMealType);
+      const prettyName =
+        currentMealType === "meal" ? "this meal" : currentMealType;
 
       const existing = meals[currentMealType] || {};
 
@@ -150,7 +157,6 @@ function setupPopupButtons() {
   }
 }
 
-// Delete a meal when clicking on the details text
 function setupDeleteOnDetails() {
   document.addEventListener("click", (e) => {
     const details = e.target;
@@ -173,20 +179,27 @@ function setupDeleteOnDetails() {
     renderMeals();
   });
 }
-function resetMeals() {
-  if (!confirm("Clear all today's meals and reset calories to 0?")) return;
 
-  meals = {};                 // empty the in-memory object
-  localStorage.removeItem("uf_meals");  // or saveMeals() after clearing
-  renderMeals();              // re-draw UI (total becomes 0, messages reset)
+function resetMeals() {
+  const ok = confirm("Clear all today's meals and reset calories to 0?");
+  if (!ok) return;
+
+  meals = {};
+  localStorage.removeItem("uf_meals");
+  renderMeals();
 }
 
-// Initialize when DOM is ready
+// Initialize on DOM ready
 document.addEventListener("DOMContentLoaded", () => {
   loadMeals();
   renderMeals();
   setupAddButtons();
   setupPopupButtons();
   setupDeleteOnDetails();
-});
 
+  // Hook up the Reset Day button
+  const resetBtn = document.getElementById("resetDay");
+  if (resetBtn) {
+    resetBtn.addEventListener("click", resetMeals);
+  }
+});
