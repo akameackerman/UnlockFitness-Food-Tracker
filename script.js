@@ -1,23 +1,29 @@
+// Unlock Fitness – Food Tracker JavaScript
+
 const DAILY_GOAL = 2000;
 
-// All meals are stored here
+// meals will be an object like:
+// { breakfast: { name: 'Oatmeal', calories: 250 }, lunch: {...}, dinner: {...} }
 let meals = {};
+
+// which meal user clicked (+)
 let currentMealType = null;
 
+// Map label text to a key we use in JS/localStorage
 function getMealTypeFromLabel(labelText) {
-  const lower = (labelText || "").toLowerCase();
+  const lower = labelText.toLowerCase();
   if (lower.includes("breakfast")) return "breakfast";
   if (lower.includes("lunch")) return "lunch";
   if (lower.includes("dinner")) return "dinner";
   return "meal";
 }
 
+// Find the .meal div for a given type
 function findMealRow(type) {
   const rows = document.querySelectorAll(".meal");
   for (const row of rows) {
     const label = row.querySelector(".label");
     if (!label) continue;
-
     const text = label.textContent.toLowerCase();
     if (type === "breakfast" && text.includes("breakfast")) return row;
     if (type === "lunch" && text.includes("lunch")) return row;
@@ -26,10 +32,12 @@ function findMealRow(type) {
   return null;
 }
 
-// Render meals + total calories on the page 
+// Update Total Calories text and meal descriptions
 function renderMeals() {
+  // Make sure meals is at least an empty object
   meals = meals || {};
 
+  // Render each meal row text
   ["breakfast", "lunch", "dinner"].forEach((type) => {
     const row = findMealRow(type);
     if (!row) return;
@@ -51,40 +59,35 @@ function renderMeals() {
     }
   });
 
-  //  Total calories
+  // Calculate total calories
   const total = Object.values(meals).reduce((sum, m) => {
     if (!m) return sum;
     return sum + (m.calories || 0);
   }, 0);
 
-  // Total Calories text
   const totalStrong = document.querySelector(".today-pill strong");
   if (totalStrong) {
     totalStrong.textContent = `${total} Kcal / ${DAILY_GOAL} kcal`;
   }
 }
 
-//  Save meals to localStorage 
+// Save to localStorage
 function saveMeals() {
   localStorage.setItem("uf_meals", JSON.stringify(meals));
 }
 
-// Load meals from localStorage
+// Load from localStorage
 function loadMeals() {
   const saved = localStorage.getItem("uf_meals");
-  if (!saved) {
-    meals = {};
-    return;
-  }
+  if (!saved) return;
   try {
     meals = JSON.parse(saved) || {};
   } catch (e) {
-    console.error("Error parsing saved meals:", e);
     meals = {};
   }
 }
 
-// "+" buttons (Breakfast / Lunch / Dinner) 
+// Handle clicking the "+" buttons (Breakfast / Lunch / Dinner)
 function setupAddButtons() {
   const addButtons = document.querySelectorAll(".add");
   const title = document.getElementById("eatTitle");
@@ -95,6 +98,7 @@ function setupAddButtons() {
         btn.getAttribute("aria-label") || btn.textContent || "Add Meal";
       currentMealType = getMealTypeFromLabel(labelText);
 
+      // Update popup title to show which meal
       if (title && currentMealType !== "meal") {
         const niceName =
           currentMealType.charAt(0).toUpperCase() +
@@ -103,32 +107,32 @@ function setupAddButtons() {
       } else if (title) {
         title.textContent = "Did you eat today?";
       }
+      // overlay opens automatically because of href="#eat"
     });
   });
 }
 
-// Popup buttons inside the modal
+// Buttons inside the popup
 function setupPopupButtons() {
   const yesButton = document.querySelector(".pill.pill-ghost");
   const addMealButton = document.querySelector(".pill.pill-primary");
 
-  // "Yes, I did"
+  // "Yes, I did" just closes the popup
   if (yesButton) {
     yesButton.addEventListener("click", (e) => {
       e.preventDefault();
-      window.location.hash = "";
+      window.location.hash = ""; // close overlay
     });
   }
 
-  // "Add a meal"
+  // "Add a meal" – prompt for name + calories
   if (addMealButton) {
     addMealButton.addEventListener("click", (e) => {
       e.preventDefault();
 
       if (!currentMealType) currentMealType = "meal";
 
-      const prettyName =
-        currentMealType === "meal" ? "this meal" : currentMealType;
+      const prettyName = (currentMealType === "meal" ? "this meal" : currentMealType);
 
       const existing = meals[currentMealType] || {};
 
@@ -152,11 +156,12 @@ function setupPopupButtons() {
       saveMeals();
       renderMeals();
 
-      window.location.hash = ""; 
+      window.location.hash = ""; // close overlay
     });
   }
 }
 
+// Delete a meal when clicking on the details text
 function setupDeleteOnDetails() {
   document.addEventListener("click", (e) => {
     const details = e.target;
@@ -179,7 +184,6 @@ function setupDeleteOnDetails() {
     renderMeals();
   });
 }
-
 function resetMeals() {
   console.log("✅ resetMeals() called");
 
